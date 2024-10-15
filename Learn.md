@@ -69,8 +69,11 @@ Access values as follows
 3) "Kigali"
 4) "Hello World"
 ```
+
 # Strings (basic data structure stored by redis) - data structure store
+
 This data structure is the building block of other data structures
+
 ```
 127.0.0.1:6379> set name jonathan
 OK
@@ -91,7 +94,9 @@ string
 127.0.0.1:6379> type user
 string
 ```
+
 Every data stored in redis is stored as a string value
+
 ```
 127.0.0.1:6379>  strlen name
 (integer) 8
@@ -126,7 +131,9 @@ string
 127.0.0.1:6379> decrby votes 99
 (integer) 1
 ```
+
 # Setting key expires
+
 ```
 127.0.0.1:6379> set currentPrice 2000 ex 20
 OK
@@ -137,7 +144,9 @@ OK
 127.0.0.1:6379> get currentPrice
 (nil)
 ```
+
 Above we set the currentPrice to 20 seconds and we can check the duration using `ttl` and -2 means it has already expired and when we do get - we see nil - means 20 seconds passed
+
 ```
 127.0.0.1:6379> setex currentPrice 40 2000
 OK
@@ -150,9 +159,11 @@ OK
 127.0.0.1:6379>
 127.0.0.1:6379> ttl currentPrice
 ```
+
 psetex to deal in milliseconds
 
-# Deleting a key in Redis   
+# Deleting a key in Redis
+
 ```
 127.0.0.1:6379> del name
 (integer) 1
@@ -162,7 +173,9 @@ psetex to deal in milliseconds
 1) (nil)
 2) (nil)
 ```
+
 # Lists Explained
+
 ```
 127.0.0.1:6379> rpush names1 Jonathan
 (integer) 1
@@ -266,32 +279,260 @@ psetex to deal in milliseconds
 4) "Hari"
 ```
 
+# Hashes explained
 
+Hash is a data structure that is very interesting in a way that it helps us to store records , these records are collections of string fields and string values.Each time we have a record . that record maps on to collections of different strings which are keys refer to them as fields and then values
 
+```
+abhimvp@Tinku:~$ redis-cli
+127.0.0.1:6379> hset person1 name Jonathan age 23 nationality Uganda
+(integer) 0
+127.0.0.1:6379> hkeys person1
+1) "name"
+2) "age"
+3) "nationality"
+127.0.0.1:6379> hvals person1
+1) "Jonathan"
+2) "23"
+3) "Uganda"
+127.0.0.1:6379> hget person1 age
+"23"
+127.0.0.1:6379> hget person1 anme
+(nil)
+127.0.0.1:6379> hget person1 name
+"Jonathan"
+127.0.0.1:6379> hexists person1 gender
+(integer) 0
+127.0.0.1:6379> hexists person1 name
+(integer) 1
+127.0.0.1:6379> hgetall person1
+1) "name"
+2) "Jonathan"
+3) "age"
+4) "23"
+5) "nationality"
+6) "Uganda"
+127.0.0.1:6379> hincrby person1 age
+(error) ERR wrong number of arguments for 'hincrby' command
+127.0.0.1:6379> hincrby person1 age 1
+(integer) 24
+127.0.0.1:6379> hget person1 age
+"24"
+127.0.0.1:6379> hset person1 name Abhishek
+(integer) 0
+127.0.0.1:6379> hget person1 name
+"Abhishek"
+127.0.0.1:6379> hsetnx person1 age 45
+(integer) 0
+127.0.0.1:6379> hgetall person1
+1) "name"
+2) "Abhishek"
+3) "age"
+4) "24"
+5) "nationality"
+6) "Uganda"
+127.0.0.1:6379> hdel person1 age
+(integer) 1
+127.0.0.1:6379> hgetall person1
+1) "name"
+2) "Abhishek"
+3) "nationality"
+4) "Uganda"
+127.0.0.1:6379>
+```
 
+# Sets explained
 
+set provides us a way in which u can be able to store unique items and the order doesn't actually matter
 
+```
+127.0.0.1:6379> sadd langs1 Python java PHP CSharp GO Gart
+(integer) 6
+127.0.0.1:6379> sadd langs1 Python
+(integer) 0
+127.0.0.1:6379> smembers langs1
+1) "Python"
+2) "java"
+3) "PHP"
+4) "CSharp"
+5) "GO"
+6) "Gart"
+127.0.0.1:6379> sismember langs1 Rust
+(integer) 0
+127.0.0.1:6379> sismember langs1 Python
+(integer) 1
+127.0.0.1:6379> sismember langs1 java
+(integer) 1
+127.0.0.1:6379> srem langs1 Java
+(integer) 0
+127.0.0.1:6379> sismember langs1 java
+(integer) 1
+127.0.0.1:6379> srem langs1 java
+(integer) 1
+127.0.0.1:6379> sismember langs1 java
+(integer) 0
+127.0.0.1:6379> smembers langs1
+1) "Python"
+2) "PHP"
+3) "CSharp"
+4) "GO"
+5) "Gart"
+127.0.0.1:6379> sadd langs2 Java PHP Ruby Kotlin JavaScript C++Python
+(integer) 6
+127.0.0.1:6379> sunion langs1 langs2
+ 1) "Python"
+ 2) "PHP"
+ 3) "CSharp"
+ 4) "GO"
+ 5) "Gart"
+ 6) "Java"
+ 7) "Ruby"
+ 8) "Kotlin"
+ 9) "JavaScript"
+10) "C++Python"
+127.0.0.1:6379> sinter langs1 langs2
+1) "PHP"
+127.0.0.1:6379> sinter langs2 langs1
+1) "PHP"
+127.0.0.1:6379> sinterstore langs3 langs1 langs2
+(integer) 1
+127.0.0.1:6379> smembers langs3
+1) "PHP"
+127.0.0.1:6379> sdiff langs1 langs2
+1) "Python"
+2) "CSharp"
+3) "GO"
+4) "Gart"
+127.0.0.1:6379> sdiffstore langs4 langs1 langs2
+(integer) 4
+127.0.0.1:6379> smembers langs4
+1) "Python"
+2) "CSharp"
+3) "GO"
+4) "Gart"
+```
 
+# Sorted Sets Explained
 
+It's a data structure that allows us to store unique items but in an ordered way & the order of these items is determined by the score that each of the members of the sorted set has & each of the members of a sorted set also has a rank associated with it
+![alt text](images/image.png)
+`flushall` is used to clear all the items in memory
 
+```
+127.0.0.1:6379> flushall
+OK
+127.0.0.1:6379> clear
+127.0.0.1:6379> zadd leaderboard 100 James
+(integer) 1
+127.0.0.1:6379> zadd leaderboard 120 Fumes 150 Jerry 200 Gloria 245 Brad 900 Julia 900 leslie
+(integer) 6
+127.0.0.1:6379> zrange leaderboard 0 6
+1) "James"
+2) "Fumes"
+3) "Jerry"
+4) "Gloria"
+5) "Brad"
+6) "Julia"
+7) "leslie"
+127.0.0.1:6379> zrange leaderboard 0 6 withscores
+ 1) "James"
+ 2) "100"
+ 3) "Fumes"
+ 4) "120"
+ 5) "Jerry"
+ 6) "150"
+ 7) "Gloria"
+ 8) "200"
+ 9) "Brad"
+10) "245"
+11) "Julia"
+12) "900"
+13) "leslie"
+14) "900"
+127.0.0.1:6379> zrevrange leaderboard 0 6 withscores
+ 1) "leslie"
+ 2) "900"
+ 3) "Julia"
+ 4) "900"
+ 5) "Brad"
+ 6) "245"
+ 7) "Gloria"
+ 8) "200"
+ 9) "Jerry"
+10) "150"
+11) "Fumes"
+12) "120"
+13) "James"
+14) "100"
+127.0.0.1:6379> zrank leaderboard leslie
+(integer) 6
+127.0.0.1:6379> zrank leaderboard james
+(nil)
+127.0.0.1:6379> zrank leaderboard James
+(integer) 0
+127.0.0.1:6379> zscore leaderboard James
+"100"
+127.0.0.1:6379> zscore leaderboard leslie
+"900"
+127.0.0.1:6379> zincrby leaderboard 10 James
+"110"
+127.0.0.1:6379> zincrby leaderboard -10 James
+"100"
+127.0.0.1:6379> zrange leaderboard 0 6 withscores
+ 1) "James"
+ 2) "100"
+ 3) "Fumes"
+ 4) "120"
+ 5) "Jerry"
+ 6) "150"
+ 7) "Gloria"
+ 8) "200"
+ 9) "Brad"
+10) "245"
+11) "Julia"
+12) "900"
+13) "leslie"
+14) "900"
+127.0.0.1:6379> zcount leaderboard 100 500
+(integer) 5
+127.0.0.1:6379> zrem leaderboard James
+(integer) 1
+127.0.0.1:6379> zrange leaderboard 0 6 withscores
+ 1) "Fumes"
+ 2) "120"
+ 3) "Jerry"
+ 4) "150"
+ 5) "Gloria"
+ 6) "200"
+ 7) "Brad"
+ 8) "245"
+ 9) "Julia"
+10) "900"
+11) "leslie"
+12) "900"
+```
 
+# Publish or Subscribe Model
 
+![alt text](images/image-pub-sub.png)
 
+This Model allows us to be able to asyncronously send messages between various clients and the way it acheives this is by classifying those clients into Publishers and Subscribers - so Publishers are clients that send messages , they do those activities through channels or topics & whatever clients that are subscribed to the channels will receive the messages - as per above picture
+```
+127.0.0.1:6379> publish messages "Hello WOrld"
+(integer) 1
 
+127.0.0.1:6379> subscribe messages
+1) "subscribe"
+2) "messages"
+3) (integer) 1
+Reading messages... (press Ctrl-C to quit or any key to type coReading messages... 1) "message"
+2) "messages"
+3) "Hello WOrld"
+```
+![alt text](images/image-impl.png)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+# Transactions
+![alt text](images/transactions.png)
 
 
 
