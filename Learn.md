@@ -126,3 +126,178 @@ string
 127.0.0.1:6379> decrby votes 99
 (integer) 1
 ```
+# Setting key expires
+```
+127.0.0.1:6379> set currentPrice 2000 ex 20
+OK
+127.0.0.1:6379> get currentPrice
+"2000"
+127.0.0.1:6379> ttl currentPrice
+(integer) -2
+127.0.0.1:6379> get currentPrice
+(nil)
+```
+Above we set the currentPrice to 20 seconds and we can check the duration using `ttl` and -2 means it has already expired and when we do get - we see nil - means 20 seconds passed
+```
+127.0.0.1:6379> setex currentPrice 40 2000
+OK
+127.0.0.1:6379> ttl currentPrice
+(integer) 34
+127.0.0.1:6379> ttl currentPrice
+(integer) 32
+127.0.0.1:6379> ttl currentPrice
+(integer) 31
+127.0.0.1:6379>
+127.0.0.1:6379> ttl currentPrice
+```
+psetex to deal in milliseconds
+
+# Deleting a key in Redis   
+```
+127.0.0.1:6379> del name
+(integer) 1
+127.0.0.1:6379> del age
+(integer) 1
+127.0.0.1:6379> mget name age
+1) (nil)
+2) (nil)
+```
+# Lists Explained
+```
+127.0.0.1:6379> rpush names1 Jonathan
+(integer) 1
+127.0.0.1:6379> llen names1
+(integer) 1
+127.0.0.1:6379> lpush names1 Jerry
+(integer) 2
+127.0.0.1:6379> llen names1
+(integer) 2
+127.0.0.1:6379> lindex names1 0
+"Jerry"
+127.0.0.1:6379> lindex names1 1
+"Jonathan"
+127.0.0.1:6379> lrange names1 0 1
+1) "Jerry"
+2) "Jonathan"
+127.0.0.1:6379> rpush names1 Abhishek
+(integer) 3
+127.0.0.1:6379> lpush names1 sam anudeep
+(integer) 5
+127.0.0.1:6379> lrange names1 0 1
+1) "anudeep"
+2) "sam"
+127.0.0.1:6379> lrange names1 0 5
+1) "anudeep"
+2) "sam"
+3) "Jerry"
+4) "Jonathan"
+5) "Abhishek"
+127.0.0.1:6379> rpush names1 Hari venu vyshak
+(integer) 8
+127.0.0.1:6379> lrange names1 0 5
+1) "anudeep"
+2) "sam"
+3) "Jerry"
+4) "Jonathan"
+5) "Abhishek"
+6) "Hari"
+127.0.0.1:6379> lrange names1 -3 -1
+1) "Hari"
+2) "venu"
+3) "vyshak"
+127.0.0.1:6379> lrange names1 0 -1
+1) "anudeep"
+2) "sam"
+3) "Jerry"
+4) "Jonathan"
+5) "Abhishek"
+6) "Hari"
+7) "venu"
+8) "vyshak"
+127.0.0.1:6379> lrange names1 0 -6
+1) "anudeep"
+2) "sam"
+3) "Jerry"
+127.0.0.1:6379> lrem names1 1 Jerry
+(integer) 1
+127.0.0.1:6379> lrange names1 0 -6
+1) "anudeep"
+2) "sam"
+127.0.0.1:6379> lrange names1 0 -1
+1) "anudeep"
+2) "sam"
+3) "Jonathan"
+4) "Abhishek"
+5) "Hari"
+6) "venu"
+7) "vyshak"
+127.0.0.1:6379> llen names1
+(integer) 7
+127.0.0.1:6379> lpop names1
+"anudeep"
+127.0.0.1:6379> lrange names1 0 3
+1) "sam"
+2) "Jonathan"
+3) "Abhishek"
+4) "Hari"
+127.0.0.1:6379> lrange names1 0 7
+1) "sam"
+2) "Jonathan"
+3) "Abhishek"
+4) "Hari"
+5) "venu"
+6) "vyshak"
+127.0.0.1:6379> rpop names1
+"vyshak"
+127.0.0.1:6379> lrange names1 0 7
+1) "sam"
+2) "Jonathan"
+3) "Abhishek"
+4) "Hari"
+5) "venu"
+127.0.0.1:6379> rpoplpush names1 names2
+"venu"
+127.0.0.1:6379> lrange names2 0 1
+1) "venu"
+127.0.0.1:6379> lrange names1 0 7
+1) "sam"
+2) "Jonathan"
+3) "Abhishek"
+4) "Hari"
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
